@@ -1,0 +1,17 @@
+name: ark
+version: 1.0.0
+release: 1
+description: Ark is a simple file manager for the terminal
+arch: ["any"]
+url: https://github.com/JP-Makers/ark
+license: MIT
+depends: ["bash"]
+provides: ["ark"]
+conflicts: ["ark"]
+sources: ["ark.tar.gz::https://github.com/JP-Makers/ark/releases/download/v$version/ark.tar.gz"]
+sha256sums: ["a31c61e733ae21eaa645de0e870c03d4fdb812c7e5a0a5666ef229ceba7fa8f4"]
+
+package: {
+    install -m755 "ark" to "/usr/bin/"
+    install -m644 "LICENSE" to "/usr/share/licenses/ark/"
+}

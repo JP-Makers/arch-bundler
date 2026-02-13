@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=app-name
-Icon=/usr/share/icons/app-name/app-name.svg
-Comment= app description
-Terminal=false
-Exec=app-name %u
-Type=Application
-Categories=Utility
