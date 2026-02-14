@@ -14,12 +14,13 @@ pub struct Metadata {
     pub provides: Vec<String>,
     pub conflicts: Vec<String>,
     pub sources: Vec<String>,
+    pub md5sums: Vec<String>,
+    pub sha1sums: Vec<String>,
     pub sha256sums: Vec<String>,
+    pub sha512sums: Vec<String>,
 }
 
-pub fn extract_all_metadata(
-    metadata_path: &str,
-) -> Result<Metadata, Box<dyn std::error::Error>> {
+pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::error::Error>> {
     let metadata_file = File::open(metadata_path)?;
     let reader = BufReader::new(metadata_file);
 
@@ -29,7 +30,11 @@ pub fn extract_all_metadata(
         let line = line?;
         let trimmed = line.trim();
 
-        if trimmed.is_empty() || trimmed.starts_with('#') || trimmed == "package: {" || trimmed == "}" {
+        if trimmed.is_empty()
+            || trimmed.starts_with('#')
+            || trimmed == "package: {"
+            || trimmed == "}"
+        {
             continue;
         }
 
@@ -49,7 +54,10 @@ pub fn extract_all_metadata(
                 "provides" => metadata.provides = parse_array(value),
                 "conflicts" => metadata.conflicts = parse_array(value),
                 "sources" => metadata.sources = parse_array(value),
+                "md5sums" => metadata.md5sums = parse_array(value),
+                "sha1sums" => metadata.sha1sums = parse_array(value),
                 "sha256sums" => metadata.sha256sums = parse_array(value),
+                "sha512sums" => metadata.sha512sums = parse_array(value),
                 _ => {}
             }
         }
@@ -65,8 +73,8 @@ pub fn extract_all_metadata(
 
     if metadata.description.is_empty() {
         return Err("Package description not found".into());
-    } 
-    
+    }
+
     if metadata.arch.is_empty() {
         return Err("Package arch not found".into());
     }
@@ -95,9 +103,15 @@ pub fn extract_all_metadata(
         return Err("Package sources not found".into());
     }
 
-    if metadata.sha256sums.is_empty() {
-        return Err("Package sha256sums not found".into());
-    }   
+    if metadata.md5sums.is_empty()
+        && metadata.sha1sums.is_empty()
+        && metadata.sha256sums.is_empty()
+        && metadata.sha512sums.is_empty()
+    {
+        return Err(
+            "No package checksums found (md5sums, sha1sums, sha256sums, or sha512sums)".into(),
+        );
+    }
 
     Ok(metadata)
 }
@@ -112,14 +126,12 @@ fn parse_array(value: &str) -> Vec<String> {
         .collect()
 }
 
-pub fn extract_metadata(
-    metadata_path: &str,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let metadata = extract_all_metadata(metadata_path)?;
+pub fn print_metadata(metadata_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let metadata = extract_metadata(metadata_path)?;
 
     println!("Package: {}", metadata.name);
     println!("Version: {}", metadata.version);
-    println!("Description: {}", metadata.description); 
+    println!("Description: {}", metadata.description);
     println!("Arch: {:?}", metadata.arch);
     println!("URL: {}", metadata.url);
     println!("License: {}", metadata.license);
