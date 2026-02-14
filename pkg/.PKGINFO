@@ -1,0 +1,12 @@
+pkgname = twincan
+pkgbase = twincan
+xdata = pkgtype=pkg
+pkgver = 1.0.0-1
+pkgdesc = Twincan is a simple file manager for the terminal
+url = https://github.com/JP-Makers/twincan
+builddate = 1771092125
+packager = John Doe <john@example.org>
+size = 181849963
+arch = any
+license = GPL-3.0-or-later
+depend = bash

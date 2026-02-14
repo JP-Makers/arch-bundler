@@ -1,0 +1,13 @@
+format = 2
+builddate = 1771092125
+builddir = /build
+startdir = /startdir/
+buildtool = devtools
+buildtoever = 1:1.2.1-1-any
+installed = other-example-1.2.3-1-any
+packager = John Doe <john@example.org>
+pkgarch = any
+pkgbase = twincan
+pkgbuild_sha256sum = b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c
+pkgname = twincan
+pkgver = 1.0.0-1
