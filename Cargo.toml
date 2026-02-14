@@ -1,5 +1,5 @@
 [package]
-name = "arch-bundler"
+name = "linux-bundler"
 version = "0.1.0"
 edition = "2024"
 
@@ -8,5 +8,10 @@ alpm-compress = "0.1.2"
 alpm-mtree = "0.3.2"
 alpm-package = "0.4.1"
 alpm-types = "0.11.1"
+bzip2 = "0.6.1"
+flate2 = "1.1.9"
+tar = "0.4.44"
 tempfile = "3.25.0"
 testresult = "0.4.1"
+liblzma = "0.4.5"
+zstd = "0.13.3"
