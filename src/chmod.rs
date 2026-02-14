@@ -5,14 +5,14 @@ use std::io::{BufRead, BufReader};
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 
-pub fn build_package(
+pub fn chmod_package(
     metadata_path: &str,
     metadata: &Metadata,
 ) -> Result<(), Box<dyn std::error::Error>> {
     println!("Building Package: {}", metadata.name);
 
     // Use a 'bundle' directory to avoid conflicts with source files/directories of the same name
-    let base_dir = PathBuf::from(&metadata.name);
+    let base_dir = PathBuf::from("pkg");
 
     // Clean up previous bundle if it exists
     if base_dir.exists() {
@@ -46,17 +46,15 @@ pub fn build_package(
             // Source file with variable expansion
             let source_file_name = parts[2].trim_matches('"').to_string();
             //source_file_name = source_file_name.replace("$name", &metadata.name);
-            let source_dir = Path::new(&metadata.sources[0]);
+            let source_dir = Path::new(&metadata.name);
             let source_path = source_dir.join(&source_file_name);
 
             if !source_path.exists() {
-                println!("Source not found: {:?}", source_path);
-                continue;
+                return Err(format!("Source not found: {:?}", source_path).into());
             }
 
             if source_path.is_dir() {
-                println!("Source is a directory, not a file: {:?}", source_path);
-                continue;
+                return Err(format!("Source is a directory, not a file: {:?}", source_path).into());
             }
 
             // Destination with variable expansion
@@ -68,7 +66,9 @@ pub fn build_package(
 
             // If destination is directory → append filename
             if dest_path.ends_with('/') || !Path::new(&dest_path).extension().is_some() {
-                full_dest = full_dest.join(&source_file_name);
+                if let Some(file_name) = Path::new(&source_file_name).file_name() {
+                    full_dest = full_dest.join(file_name);
+                }
             }
 
             println!("Installing:");

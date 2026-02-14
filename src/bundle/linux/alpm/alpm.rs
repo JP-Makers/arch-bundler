@@ -6,14 +6,10 @@ use alpm_compress::compression::CompressionSettings;
 use alpm_mtree::create_mtree_v2_from_input_dir;
 use alpm_package::{InputDir, OutputDir, Package, PackageCreationConfig, PackageInput};
 use alpm_types::MetadataFileName;
-use tempfile::TempDir;
 
 pub fn alpm_build() -> testresult::TestResult {
     // Create a temporary directory for input files only
-    let temp_dir = TempDir::new()?;
-    let input_dir = temp_dir.path().join("input");
-    create_dir_all(&input_dir)?;
-    let input_dir = InputDir::new(input_dir)?;
+    let input_dir = InputDir::new(std::env::current_dir()?.join("pkg"))?;
 
     // Use a permanent output directory in the current working directory
     let output_path = std::env::current_dir()?.join("output");

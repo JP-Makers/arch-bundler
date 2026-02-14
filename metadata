@@ -8,12 +8,12 @@ license: MIT
 depends: ["bash"]
 provides: ["twincan"]
 conflicts: ["twincan"]
-sources: ["/home/jeyaraj/Pictures/TwinCAN"]
-sha256sums: ["a31c61e733ae21eaa645de0e870c03d4fdb812c7e5a0a5666ef229ceba7fa8f4"]
+sources: ["/home/jeyaraj/Pictures/TwinCAN.tar.bz2"]
+md5sums: ["c22522c02789ec40bf993bf03012e29d", "6911f9e0ef2f3a17137696efedecec59", "ffe437529ca0f5e641ce6807883e0bb6"]
 
 package: {
-    install -m755 "TwinCAN" to "/usr/bin/"
-    install -m644 "TwinCAN.desktop" to "/usr/share/applications/"
-    install -m644 "TwinCAN.svg" to "/usr/share/icons/twincan/"
-    install -m644 "LICENSE" to "/usr/share/licenses/twincan/"
+    install -m755 "TwinCAN/new/TwinCAN" to "/usr/bin/"
+    install -m644 "TwinCAN/TwinCAN.desktop" to "/usr/share/applications/"
+    install -m644 "TwinCAN/TwinCAN.svg" to "/usr/share/icons/twincan/"
+    install -m644 "TwinCAN/LICENSE" to "/usr/share/licenses/twincan/"
 }
