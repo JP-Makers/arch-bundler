@@ -1,14 +1,24 @@
-use std::path::PathBuf;
+mod bundle;
 mod chmod;
+mod metadata;
+
+use crate::bundle::linux::alpm::alpm_build;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Define source directory here
-    let source_dir = PathBuf::from("source");
-
     // Metadata file path
     let metadata_path = "metadata";
+    metadata::extract_metadata(metadata_path)?;
 
-    chmod::build_package(metadata_path, source_dir)?;
+    // Extract all metadata
+    let metadata = metadata::extract_all_metadata(metadata_path)?;
+
+    // Display metadata (optional, can be called via metadata::extract_metadata if intended)
+    // metadata::extract_metadata(metadata_path)?;
+
+    // Build package
+    chmod::build_package(metadata_path, &metadata)?;
+
+    alpm_build();
 
     Ok(())
 }

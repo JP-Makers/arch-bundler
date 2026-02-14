@@ -172,18 +172,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f0e0fee31ef5ed1ba1316088939cea399010ed7731dba877ed44aeb407a75ea"
 
 [[package]]
-name = "arch-bundler"
-version = "0.1.0"
-dependencies = [
- "alpm-compress",
- "alpm-mtree",
- "alpm-package",
- "alpm-types",
- "tempfile",
- "testresult",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -946,6 +934,23 @@ dependencies = [
  "bitflags",
  "libc",
  "redox_syscall",
+]
+
+[[package]]
+name = "linux-bundler"
+version = "0.1.0"
+dependencies = [
+ "alpm-compress",
+ "alpm-mtree",
+ "alpm-package",
+ "alpm-types",
+ "bzip2",
+ "flate2",
+ "liblzma",
+ "tar",
+ "tempfile",
+ "testresult",
+ "zstd",
 ]
 
 [[package]]

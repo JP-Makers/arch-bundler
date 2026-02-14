@@ -8,7 +8,7 @@ use alpm_package::{InputDir, OutputDir, Package, PackageCreationConfig, PackageI
 use alpm_types::MetadataFileName;
 use tempfile::TempDir;
 
-fn main() -> testresult::TestResult {
+pub fn alpm_build() -> testresult::TestResult {
     // Create a temporary directory for input files only
     let temp_dir = TempDir::new()?;
     let input_dir = temp_dir.path().join("input");
