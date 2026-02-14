@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=TwinCAN
-Icon=/usr/share/icons/TwinCAN/TwinCAN.svg
-Comment= DBC Compare Tool
-Terminal=false
-Exec=TwinCAN %u
-Type=Application
-Categories=Utility
