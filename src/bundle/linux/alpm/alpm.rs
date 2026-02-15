@@ -5,12 +5,15 @@ use alpm_compress::compression::CompressionSettings;
 use alpm_mtree::create_mtree_v2_from_input_dir;
 use alpm_package::{InputDir, OutputDir, Package, PackageCreationConfig, PackageInput};
 
-pub fn alpm_build() -> testresult::TestResult {
-    // Create a temporary directory for input files only
-    let input_dir = InputDir::new(std::env::current_dir()?.join("pkg"))?;
+pub fn alpm_build() -> Result<(), Box<dyn std::error::Error>> {
+    let input_path = std::env::current_dir()?.join("pkg");
+    let input_dir = InputDir::new(input_path)?;
 
     // Use a permanent output directory in the current working directory
     let output_path = std::env::current_dir()?.join("output");
+    if !output_path.exists() {
+        std::fs::create_dir_all(&output_path)?;
+    }
     let output_dir = OutputDir::new(output_path)?;
 
     // Create a valid, but minimal BUILDINFOv1 file.

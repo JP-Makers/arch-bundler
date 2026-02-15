@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Metadata {
     pub name: String,
     pub version: String,
@@ -18,6 +18,36 @@ pub struct Metadata {
     pub sha1sums: Vec<String>,
     pub sha256sums: Vec<String>,
     pub sha512sums: Vec<String>,
+    pub build_env: Vec<String>,
+}
+
+impl Default for Metadata {
+    fn default() -> Self {
+        Self {
+            name: String::new(),
+            version: String::new(),
+            release: String::new(),
+            description: String::new(),
+            arch: Vec::new(),
+            url: String::new(),
+            license: String::new(),
+            depends: Vec::new(),
+            provides: Vec::new(),
+            conflicts: Vec::new(),
+            sources: Vec::new(),
+            md5sums: Vec::new(),
+            sha1sums: Vec::new(),
+            sha256sums: Vec::new(),
+            sha512sums: Vec::new(),
+            build_env: vec![
+                "!distcc".to_string(),
+                "color".to_string(),
+                "!ccache".to_string(),
+                "check".to_string(),
+                "!sign".to_string(),
+            ],
+        }
+    }
 }
 
 pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::error::Error>> {
@@ -58,6 +88,7 @@ pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::er
                 "sha1sums" => metadata.sha1sums = parse_array(value),
                 "sha256sums" => metadata.sha256sums = parse_array(value),
                 "sha512sums" => metadata.sha512sums = parse_array(value),
+                "build_env" => metadata.build_env = parse_array(value),
                 _ => {}
             }
         }
@@ -140,6 +171,7 @@ pub fn print_metadata(metadata_path: &str) -> Result<(), Box<dyn std::error::Err
     println!("Conflicts: {:?}", metadata.conflicts);
     println!("Sources: {:?}", metadata.sources);
     println!("SHA256SUMS: {:?}", metadata.sha256sums);
+    println!("Build Env: {:?}", metadata.build_env);
 
     Ok(())
 }

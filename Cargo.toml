@@ -8,9 +8,9 @@ edition = "2024"
 alpm-compress = "0.1.2"
 alpm-mtree = "0.3.2"
 alpm-package = "0.4.1"
+alpm-buildinfo = "0.5.2"
+alpm-pkginfo = "0.6.1"
 alpm-types = "0.11.1"
-tempfile = "3.25.0"
-testresult = "0.4.1"
 
 # compression
 bzip2 = "0.6.1"
