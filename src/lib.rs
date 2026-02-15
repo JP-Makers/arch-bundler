@@ -35,7 +35,7 @@ pub async fn build_package() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     chmod_package("metadata", &metadata)?;
-    alpm_build();
+    alpm_build()?;
     // clean::remove_source("pkg")?;
     Ok(())
 }

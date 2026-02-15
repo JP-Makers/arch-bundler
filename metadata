@@ -10,6 +10,7 @@ provides: ["twincan"]
 conflicts: ["twincan"]
 sources: ["/home/jeyaraj/Pictures/TwinCAN.tar.bz2"]
 md5sums: ["c22522c02789ec40bf993bf03012e29d", "6911f9e0ef2f3a17137696efedecec59", "ffe437529ca0f5e641ce6807883e0bb6"]
+build_env: ["check", "color"]
 
 package: {
     install -m755 "TwinCAN/new/TwinCAN" to "/usr/bin/"
