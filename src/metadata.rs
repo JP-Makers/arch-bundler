@@ -19,6 +19,10 @@ pub struct Metadata {
     pub sha256sums: Vec<String>,
     pub sha512sums: Vec<String>,
     pub build_env: Vec<String>,
+    pub appimage_exec: String,
+    pub package_instructions: Vec<String>,
+    pub appimage_icon_instructions: Vec<String>,
+    pub appimage_desktop_instructions: Vec<String>,
 }
 
 impl Default for Metadata {
@@ -46,6 +50,10 @@ impl Default for Metadata {
                 "check".to_string(),
                 "!sign".to_string(),
             ],
+            appimage_exec: String::new(),
+            package_instructions: Vec::new(),
+            appimage_icon_instructions: Vec::new(),
+            appimage_desktop_instructions: Vec::new(),
         }
     }
 }
@@ -55,22 +63,39 @@ pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::er
     let reader = BufReader::new(metadata_file);
 
     let mut metadata = Metadata::default();
-
-    for line in reader.lines() {
+    let mut lines = reader.lines();
+    while let Some(line) = lines.next() {
         let line = line?;
         let trimmed = line.trim();
 
-        if trimmed.is_empty()
-            || trimmed.starts_with('#')
-            || trimmed == "package: {"
-            || trimmed == "}"
-        {
+        if trimmed.is_empty() || trimmed.starts_with('#') {
             continue;
         }
 
         if let Some((key, value)) = trimmed.split_once(':') {
             let key = key.trim();
             let value = value.trim();
+
+            if value == "{" {
+                let mut block_lines = Vec::new();
+                while let Some(block_line) = lines.next() {
+                    let block_line = block_line?;
+                    let trimmed_block = block_line.trim();
+                    if trimmed_block == "}" {
+                        break;
+                    }
+                    if !trimmed_block.is_empty() && !trimmed_block.starts_with('#') {
+                        block_lines.push(trimmed_block.to_string());
+                    }
+                }
+                match key {
+                    "package" => metadata.package_instructions = block_lines,
+                    "appimage_icon" => metadata.appimage_icon_instructions = block_lines,
+                    "appimage_desktop" => metadata.appimage_desktop_instructions = block_lines,
+                    _ => {}
+                }
+                continue;
+            }
 
             match key {
                 "name" => metadata.name = value.to_string(),
@@ -89,6 +114,7 @@ pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::er
                 "sha256sums" => metadata.sha256sums = parse_array(value),
                 "sha512sums" => metadata.sha512sums = parse_array(value),
                 "build_env" => metadata.build_env = parse_array(value),
+                "appimage_exec" => metadata.appimage_exec = value.trim_matches('"').to_string(),
                 _ => {}
             }
         }
