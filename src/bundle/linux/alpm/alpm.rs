@@ -1,12 +1,17 @@
 use super::build_info::create_build_info;
 use super::pkg_info::create_package_info;
+use crate::chmod::chmod_package;
+use crate::metadata;
 
 use alpm_compress::compression::CompressionSettings;
 use alpm_mtree::create_mtree_v2_from_input_dir;
 use alpm_package::{InputDir, OutputDir, Package, PackageCreationConfig, PackageInput};
 
 pub fn alpm_build() -> Result<(), Box<dyn std::error::Error>> {
-    let input_path = std::env::current_dir()?.join("pkg");
+    let metadata = metadata::extract_metadata("metadata")?;
+    let base_dir = format!("{}.alpm", metadata.name);
+    chmod_package(&base_dir, false)?;
+    let input_path = std::env::current_dir()?.join(base_dir);
     let input_dir = InputDir::new(input_path)?;
 
     // Use a permanent output directory in the current working directory

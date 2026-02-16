@@ -30,3 +30,5 @@ sha1 = "0.10.6"
 reqwest = { version = "0.13.2", features = ["stream"] }
 tokio = { version = "1.49.0", features = ["full"] }
 futures-util = "0.3.31"
+walkdir = "2.5.0"
+backhand = "0.25.0"
