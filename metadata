@@ -9,6 +9,7 @@ url: https://github.com/JP-Makers/twincan
 license: MIT
 alpm_depends: ["bash"]
 deb_depends: ["bash"]
+rpm_depends: ["bash"]
 provides: ["twincan"]
 conflicts: ["twincan"]
 alpm_build_env: ["check", "color"]

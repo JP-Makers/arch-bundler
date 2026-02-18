@@ -14,6 +14,7 @@ pub struct Metadata {
     pub license: String,
     pub alpm_depends: Vec<String>,
     pub deb_depends: Vec<String>,
+    pub rpm_depends: Vec<String>,
     pub provides: Vec<String>,
     pub conflicts: Vec<String>,
     pub sources: Vec<String>,
@@ -42,6 +43,7 @@ impl Default for Metadata {
             license: String::new(),
             alpm_depends: Vec::new(),
             deb_depends: Vec::new(),
+            rpm_depends: Vec::new(),
             provides: Vec::new(),
             conflicts: Vec::new(),
             sources: Vec::new(),
@@ -115,6 +117,7 @@ pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::er
                 "license" => metadata.license = value.to_string(),
                 "alpm_depends" => metadata.alpm_depends = parse_array(value),
                 "deb_depends" => metadata.deb_depends = parse_array(value),
+                "rpm_depends" => metadata.rpm_depends = parse_array(value),
                 "provides" => metadata.provides = parse_array(value),
                 "conflicts" => metadata.conflicts = parse_array(value),
                 "sources" => metadata.sources = parse_array(value),
@@ -166,7 +169,11 @@ pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::er
     }
 
     if metadata.deb_depends.is_empty() {
-        return Err("Package depends not found".into());
+        return Err("Package depends (deb_depends) not found".into());
+    }
+
+    if metadata.rpm_depends.is_empty() {
+        return Err("Package depends (rpm_depends) not found".into());
     }
 
     if metadata.provides.is_empty() {
@@ -217,6 +224,7 @@ pub fn print_metadata(metadata_path: &str) -> Result<(), Box<dyn std::error::Err
     println!("License: {}", metadata.license);
     println!("ALPM Depends: {:?}", metadata.alpm_depends);
     println!("DEB Depends: {:?}", metadata.deb_depends);
+    println!("RPM Depends: {:?}", metadata.rpm_depends);
     println!("Provides: {:?}", metadata.provides);
     println!("Conflicts: {:?}", metadata.conflicts);
     println!("Sources: {:?}", metadata.sources);
