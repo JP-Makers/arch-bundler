@@ -1,0 +1,12 @@
+pkgname = avedit
+pkgbase = avedit
+xdata = pkgtype=pkg
+pkgver = 0.1.2-1
+pkgdesc = Avedit is an audio video editor for the terminal
+url = https://github.com/JP-Makers/avedit
+builddate = 1771092125
+packager = Antigravity <antigravity@google.com>
+size = 1024
+arch = x86_64
+license = MIT
+depend = ffmpeg
