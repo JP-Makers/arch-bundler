@@ -16,7 +16,7 @@ pub fn create_build_info(input_path: impl AsRef<Path>) -> Result<(), Box<dyn std
     let metadata = metadata::extract_metadata("metadata")?;
 
     let mut buildenv_str = String::new();
-    for opt in &metadata.build_env {
+    for opt in &metadata.alpm_build_env {
         buildenv_str.push_str(&format!("buildenv = {}\n", opt));
     }
 

@@ -6,12 +6,14 @@ use crate::metadata;
 use alpm_compress::compression::CompressionSettings;
 use alpm_mtree::create_mtree_v2_from_input_dir;
 use alpm_package::{InputDir, OutputDir, Package, PackageCreationConfig, PackageInput};
+use std::path::PathBuf;
 
 pub fn alpm_build() -> Result<(), Box<dyn std::error::Error>> {
     let metadata = metadata::extract_metadata("metadata")?;
-    let base_dir = format!("{}.alpm", metadata.name);
-    chmod_package(&base_dir, false)?;
-    let input_path = std::env::current_dir()?.join(base_dir);
+    let alpm_dir = format!("{}.alpm", metadata.name);
+    let base_dir = PathBuf::from(&alpm_dir);
+    chmod_package(&alpm_dir, false)?;
+    let input_path = std::env::current_dir()?.join(&base_dir);
     let input_dir = InputDir::new(input_path)?;
 
     // Use a permanent output directory in the current working directory
@@ -36,6 +38,9 @@ pub fn alpm_build() -> Result<(), Box<dyn std::error::Error>> {
         PackageCreationConfig::new(package_input, output_dir, CompressionSettings::default())?;
     // Create package file.
     Package::try_from(&config)?;
+
+    // Cleanup
+    //std::fs::remove_dir_all(&base_dir)?;
 
     println!("✓ Package created successfully!");
     println!("  Location: {}/output/", std::env::current_dir()?.display());
