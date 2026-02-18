@@ -58,7 +58,7 @@ pub fn appimage_build() -> Result<(), Box<dyn std::error::Error>> {
     squashfs_build(&base_dir, &base_name)?;
 
     //Remove AppDir
-    std::fs::remove_dir_all(&base_dir)?;
+    //std::fs::remove_dir_all(&base_dir)?;
 
     let squashfs_path = format!("{}.squashfs", base_name);
     let mut squashfs_data = BufReader::new(File::open(&squashfs_path)?);
@@ -74,7 +74,7 @@ pub fn appimage_build() -> Result<(), Box<dyn std::error::Error>> {
     std::io::copy(&mut squashfs_data, &mut out_writer)?;
 
     //Remove squashfs file
-    std::fs::remove_file(&squashfs_path)?;
+    //std::fs::remove_file(&squashfs_path)?;
 
     Ok(())
 }

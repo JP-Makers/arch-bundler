@@ -7,6 +7,8 @@ mod unpack;
 
 pub use bundle::linux::alpm::alpm_build;
 pub use bundle::linux::appimage::appimage_build;
+pub use bundle::linux::deb::deb_build;
+pub use bundle::linux::rpm::rpm_build;
 pub use checksum::verify_checksum;
 pub use chmod::chmod_package;
 pub use clone::fetch_source;
@@ -30,7 +32,7 @@ pub async fn build_package() -> Result<(), Box<dyn std::error::Error>> {
             || filename.ends_with(".tar")
         {
             unpack_source(&filename, &metadata.name)?;
-            std::fs::remove_file(&filename)?;
+            //std::fs::remove_file(&filename)?;
         }
     }
 

@@ -6,11 +6,14 @@ pub struct Metadata {
     pub name: String,
     pub version: String,
     pub release: String,
+    pub maintainer: String,
+    pub email: String,
     pub description: String,
     pub arch: Vec<String>,
     pub url: String,
     pub license: String,
-    pub depends: Vec<String>,
+    pub alpm_depends: Vec<String>,
+    pub deb_depends: Vec<String>,
     pub provides: Vec<String>,
     pub conflicts: Vec<String>,
     pub sources: Vec<String>,
@@ -18,7 +21,7 @@ pub struct Metadata {
     pub sha1sums: Vec<String>,
     pub sha256sums: Vec<String>,
     pub sha512sums: Vec<String>,
-    pub build_env: Vec<String>,
+    pub alpm_build_env: Vec<String>,
     pub appimage_exec: String,
     pub package_instructions: Vec<String>,
     pub appimage_icon_instructions: Vec<String>,
@@ -31,11 +34,14 @@ impl Default for Metadata {
             name: String::new(),
             version: String::new(),
             release: String::new(),
+            maintainer: String::new(),
+            email: String::new(),
             description: String::new(),
             arch: Vec::new(),
             url: String::new(),
             license: String::new(),
-            depends: Vec::new(),
+            alpm_depends: Vec::new(),
+            deb_depends: Vec::new(),
             provides: Vec::new(),
             conflicts: Vec::new(),
             sources: Vec::new(),
@@ -43,7 +49,7 @@ impl Default for Metadata {
             sha1sums: Vec::new(),
             sha256sums: Vec::new(),
             sha512sums: Vec::new(),
-            build_env: vec![
+            alpm_build_env: vec![
                 "!distcc".to_string(),
                 "color".to_string(),
                 "!ccache".to_string(),
@@ -101,11 +107,14 @@ pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::er
                 "name" => metadata.name = value.to_string(),
                 "version" => metadata.version = value.to_string(),
                 "release" => metadata.release = value.to_string(),
+                "maintainer" => metadata.maintainer = value.to_string(),
+                "email" => metadata.email = value.to_string(),
                 "description" => metadata.description = value.to_string(),
                 "arch" => metadata.arch = parse_array(value),
                 "url" => metadata.url = value.to_string(),
                 "license" => metadata.license = value.to_string(),
-                "depends" => metadata.depends = parse_array(value),
+                "alpm_depends" => metadata.alpm_depends = parse_array(value),
+                "deb_depends" => metadata.deb_depends = parse_array(value),
                 "provides" => metadata.provides = parse_array(value),
                 "conflicts" => metadata.conflicts = parse_array(value),
                 "sources" => metadata.sources = parse_array(value),
@@ -113,7 +122,7 @@ pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::er
                 "sha1sums" => metadata.sha1sums = parse_array(value),
                 "sha256sums" => metadata.sha256sums = parse_array(value),
                 "sha512sums" => metadata.sha512sums = parse_array(value),
-                "build_env" => metadata.build_env = parse_array(value),
+                "alpm_build_env" => metadata.alpm_build_env = parse_array(value),
                 "appimage_exec" => metadata.appimage_exec = value.trim_matches('"').to_string(),
                 _ => {}
             }
@@ -126,6 +135,14 @@ pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::er
 
     if metadata.version.is_empty() {
         return Err("Package version not found".into());
+    }
+
+    if metadata.release.is_empty() {
+        return Err("Package release not found".into());
+    }
+
+    if metadata.maintainer.is_empty() {
+        return Err("Package maintainer not found".into());
     }
 
     if metadata.description.is_empty() {
@@ -144,7 +161,11 @@ pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::er
         return Err("Package license not found".into());
     }
 
-    if metadata.depends.is_empty() {
+    if metadata.alpm_depends.is_empty() {
+        return Err("Package depends not found".into());
+    }
+
+    if metadata.deb_depends.is_empty() {
         return Err("Package depends not found".into());
     }
 
@@ -188,16 +209,18 @@ pub fn print_metadata(metadata_path: &str) -> Result<(), Box<dyn std::error::Err
 
     println!("Package: {}", metadata.name);
     println!("Version: {}", metadata.version);
+    println!("Release: {}", metadata.release);
+    println!("Maintainer: {}", metadata.maintainer);
     println!("Description: {}", metadata.description);
     println!("Arch: {:?}", metadata.arch);
     println!("URL: {}", metadata.url);
     println!("License: {}", metadata.license);
-    println!("Depends: {:?}", metadata.depends);
+    println!("ALPM Depends: {:?}", metadata.alpm_depends);
+    println!("DEB Depends: {:?}", metadata.deb_depends);
     println!("Provides: {:?}", metadata.provides);
     println!("Conflicts: {:?}", metadata.conflicts);
     println!("Sources: {:?}", metadata.sources);
     println!("SHA256SUMS: {:?}", metadata.sha256sums);
-    println!("Build Env: {:?}", metadata.build_env);
 
     Ok(())
 }

@@ -34,7 +34,7 @@ depend = {}
         BUILD_DATE,
         metadata.arch.first().unwrap_or(&"any".to_string()),
         metadata.license,
-        metadata.depends.join("\ndepend = ")
+        metadata.alpm_depends.join("\ndepend = ")
     )?;
     Ok(())
 }
