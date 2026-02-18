@@ -1,0 +1,34 @@
+name: twincan
+version: 1.0.0
+release: 1
+maintainer: JP-Makers
+email: contact@jp-makers.com
+description: Twincan is a simple file manager for the terminal
+arch: ["x86_64"]
+url: https://github.com/JP-Makers/twincan
+license: MIT
+alpm_depends: ["bash"]
+deb_depends: ["bash"]
+rpm_depends: ["bash"]
+provides: ["twincan"]
+conflicts: ["twincan"]
+alpm_build_env: ["check", "color"]
+sources: ["https://github.com/JP-Makers/twincan/releases/download/v1.0.0/TwinCAN.tar.gz"]
+md5sums: ["c22522c02789ec40bf993bf03012e29d", "6911f9e0ef2f3a17137696efedecec59", "ffe437529ca0f5e641ce6807883e0bb6"]
+
+appimage_exec: "/usr/bin/TwinCAN"
+
+appimage_desktop: {
+    install -m644 "TwinCAN/TwinCAN.desktop"
+}
+
+appimage_icon: {
+    install -m644 "TwinCAN/TwinCAN.svg"
+}
+
+package: {
+    install -m755 "TwinCAN/TwinCAN" to "/usr/bin/"
+    install -m644 "TwinCAN/TwinCAN.desktop" to "/usr/share/applications/"
+    install -m644 "TwinCAN/TwinCAN.svg" to "/usr/share/icons/TwinCAN/"
+    install -m644 "TwinCAN/LICENSE" to "/usr/share/licenses/twincan/"
+}
