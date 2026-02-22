@@ -13,7 +13,7 @@ rpm_depends: ["ffmpeg"]
 provides: ["avedit"]
 conflicts: ["avedit-bin"]
 sources: ["https://github.com/JP-Makers/avedit/archive/refs/tags/v0.1.2.tar.gz"]
-md5sums: ["6574ffcf34f22d305e89d7fdaeb121e3", "6911f9e0ef2f3a17137696efedecec59", "ffe437529ca0f5e641ce6807883e0bb6"]
+sha256sums: ["673342c108487cc50ac9a05d9844fa21629ea67fc4dc857344f4961fd1cdfdaf"]
 
 
 package: {

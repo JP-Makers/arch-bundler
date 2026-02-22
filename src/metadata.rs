@@ -1,5 +1,6 @@
+use sha2::{Digest, Sha256};
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Read};
 
 #[derive(Debug)]
 pub struct Metadata {
@@ -27,6 +28,7 @@ pub struct Metadata {
     pub package_instructions: Vec<String>,
     pub appimage_icon_instructions: Vec<String>,
     pub appimage_desktop_instructions: Vec<String>,
+    pub pkgbuild_sha256sum: String,
 }
 
 impl Default for Metadata {
@@ -62,15 +64,25 @@ impl Default for Metadata {
             package_instructions: Vec::new(),
             appimage_icon_instructions: Vec::new(),
             appimage_desktop_instructions: Vec::new(),
+            pkgbuild_sha256sum: String::new(),
         }
     }
 }
 
 pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::error::Error>> {
-    let metadata_file = File::open(metadata_path)?;
-    let reader = BufReader::new(metadata_file);
+    let mut metadata_file = File::open(metadata_path)?;
+
+    // Calculate SHA256 of the metadata file
+    let mut hasher = Sha256::new();
+    let mut buffer = Vec::new();
+    metadata_file.read_to_end(&mut buffer)?;
+    hasher.update(&buffer);
+    let pkgbuild_sha256sum = hex::encode(hasher.finalize());
+
+    let reader = BufReader::new(&buffer[..]);
 
     let mut metadata = Metadata::default();
+    metadata.pkgbuild_sha256sum = pkgbuild_sha256sum;
     let mut lines = reader.lines();
     while let Some(line) = lines.next() {
         let line = line?;

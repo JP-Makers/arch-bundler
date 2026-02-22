@@ -4,8 +4,6 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-use super::build_info::BUILD_DATE;
-
 pub fn create_package_info(input_path: impl AsRef<Path>) -> Result<(), Box<dyn std::error::Error>> {
     let input_path = input_path.as_ref();
     let mut file = File::create(&input_path.join(MetadataFileName::PackageInfo.as_ref()))?;
@@ -33,7 +31,7 @@ depend = {}
         metadata.release,
         metadata.description,
         metadata.url,
-        BUILD_DATE,
+        super::build_info::get_build_date(),
         metadata.maintainer,
         metadata.email,
         metadata.arch.first().unwrap_or(&"any".to_string()),
