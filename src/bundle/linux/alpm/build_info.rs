@@ -27,7 +27,7 @@ pkgbase = {}
 pkgver = {}-{}
 pkgarch = {}
 pkgbuild_sha256sum = {}
-packager = Antigravity <antigravity@google.com>
+packager = {} <{}>
 builddate = {}
 builddir = /build
 startdir = /startdir/
@@ -44,6 +44,8 @@ installed = bar-1.2.3-1-any
         metadata.sha256sums.first().unwrap_or(
             &"b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c".to_string()
         ),
+        metadata.maintainer,
+        metadata.email,
         BUILD_DATE,
         buildenv_str
     );

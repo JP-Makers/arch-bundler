@@ -19,10 +19,12 @@ pkgver = {}-{}
 pkgdesc = {}
 url = {}
 builddate = {}
-packager = Antigravity <antigravity@google.com>
+packager = {} <{}>
 size = 1024
 arch = {}
 license = {}
+conflict = {}
+provides = {}
 depend = {}
 "#,
         metadata.name,
@@ -32,8 +34,12 @@ depend = {}
         metadata.description,
         metadata.url,
         BUILD_DATE,
+        metadata.maintainer,
+        metadata.email,
         metadata.arch.first().unwrap_or(&"any".to_string()),
         metadata.license,
+        metadata.conflicts[0],
+        metadata.provides[0],
         metadata.alpm_depends.join("\ndepend = ")
     )?;
     Ok(())
