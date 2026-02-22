@@ -1,11 +1,22 @@
 use crate::metadata;
-use alpm_types::{InstalledSize, MetadataFileName};
+use alpm_types::MetadataFileName;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-pub fn get_installed_size() -> InstalledSize {
-    InstalledSize::default()
+pub fn get_installed_size(input_path: impl AsRef<Path>) -> u64 {
+    let mut total_size = 0;
+    for entry in walkdir::WalkDir::new(input_path)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
+        if let Ok(metadata) = entry.metadata() {
+            if metadata.is_file() {
+                total_size += metadata.len();
+            }
+        }
+    }
+    total_size
 }
 
 pub fn create_package_info(input_path: impl AsRef<Path>) -> Result<(), Box<dyn std::error::Error>> {
@@ -38,7 +49,7 @@ depend = {}
         super::build_info::get_build_date(),
         metadata.maintainer,
         metadata.email,
-        get_installed_size(),
+        get_installed_size(input_path),
         metadata.arch.first().unwrap_or(&"any".to_string()),
         metadata.license,
         metadata.conflicts[0],
