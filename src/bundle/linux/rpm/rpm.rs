@@ -17,15 +17,17 @@ pub fn rpm_build() -> Result<(), Box<dyn std::error::Error>> {
         "noarch"
     };
 
+    let build_config = rpm::BuildConfig::v4().compression(rpm::CompressionType::Gzip);
+
     let mut builder = rpm::PackageBuilder::new(
         &metadata.name,
         &metadata.version,
         &metadata.license,
         architecture,
         &metadata.description,
-    );
-
-    builder = builder.release(&metadata.release);
+    )
+    .using_config(build_config)
+    .release(&metadata.release);
 
     // Add dependencies
     for dep in &metadata.rpm_depends {

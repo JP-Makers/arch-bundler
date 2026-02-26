@@ -1,22 +1,21 @@
-name: avedit
-version: 0.1.2
+name: beauty-list
+version: 0.1.1
 release: 1
 maintainer: JP-Makers
 email: contact@jp-makers.com
-description: Avedit is an audio video editor for the terminal
+description: beauty-list is a list of beautiful directory and file names
 arch: ["x86_64"]
-url: https://github.com/JP-Makers/avedit
+url: https://github.com/JP-Makers/beauty-list
 license: MIT
-alpm_depends: ["ffmpeg"]
-deb_depends: ["ffmpeg"]
-rpm_depends: ["ffmpeg"]
-provides: ["avedit"]
-conflicts: ["avedit-bin"]
-sources: ["https://github.com/JP-Makers/avedit/archive/refs/tags/v0.1.2.tar.gz"]
-sha256sums: ["673342c108487cc50ac9a05d9844fa21629ea67fc4dc857344f4961fd1cdfdaf"]
-
+alpm_depends: ["bash"]
+deb_depends: ["bash"]
+rpm_depends: ["bash"]
+provides: ["beauty-list"]
+conflicts: ["beauty-list-bin"]
+sources: ["https://github.com/JP-Makers/beauty-list/releases/download/0.1.1/bl.tar.gz"]
+sha256sums: ["4ff50e8c1c9ba002cdc360fbf1a4dbedd55da2bdb6aa5c8e9d32c865cda2dd9c", "0a632ef787e2a9da327898ed44b9c1948f8a39c3a9836b2f1a4c69dd7c640a53"]
 
 package: {
-    install -m755 "avedit-0.1.2/avedit" to "/usr/bin/"
-    install -m644 "avedit-0.1.2/LICENSE" to "/usr/share/licenses/avedit/"
+    install -m755 "bl" to "/usr/bin/"
+    install -m644 "LICENSE" to "/usr/share/licenses/beauty-list/"
 }

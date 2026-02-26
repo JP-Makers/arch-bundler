@@ -1,3 +1,4 @@
+use crate::bundle::linux::alpm::pkg_info::get_installed_size;
 use crate::chmod::chmod_package;
 use crate::metadata;
 use flate2::Compression;
@@ -41,6 +42,11 @@ pub fn deb_build() -> Result<(), Box<dyn std::error::Error>> {
         control_file,
         "Maintainer: {} <{}>",
         metadata.maintainer, metadata.email
+    )?;
+    writeln!(
+        control_file,
+        "Installed-Size: {}",
+        get_installed_size(&base_dir)
     )?;
     if !metadata.deb_depends.is_empty() {
         writeln!(control_file, "Depends: {}", metadata.deb_depends.join(", "))?;
