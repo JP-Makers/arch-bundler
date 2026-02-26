@@ -1,1 +1,9 @@
 /target
+/output
+*.deb
+*.rpm
+*.AppImage
+*.squashfs
+*.tar.gz
+*.pkg.tar.zst
+*.AppDir
