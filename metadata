@@ -1,21 +1,33 @@
-name: beauty-list
-version: 0.1.1
+name: twincan
+version: 1.0.0
 release: 1
 maintainer: JP-Makers
 email: contact@jp-makers.com
-description: beauty-list is a list of beautiful directory and file names
+description: Twincan is a simple file manager for the terminal
 arch: ["x86_64"]
-url: https://github.com/JP-Makers/beauty-list
+url: https://github.com/JP-Makers/twincan
 license: MIT
-alpm_depends: ["bash"]
-deb_depends: ["bash"]
-rpm_depends: ["bash"]
-provides: ["beauty-list"]
-conflicts: ["beauty-list-bin"]
-sources: ["https://github.com/JP-Makers/beauty-list/releases/download/0.1.1/bl.tar.gz"]
-sha256sums: ["4ff50e8c1c9ba002cdc360fbf1a4dbedd55da2bdb6aa5c8e9d32c865cda2dd9c", "0a632ef787e2a9da327898ed44b9c1948f8a39c3a9836b2f1a4c69dd7c640a53"]
+alpm_depends: ["qt6-base"]
+deb_depends: ["qt6-base-dev"]
+rpm_depends: ["qt6-qtbase-gui"]
+provides: ["twincan"]
+conflicts: ["twincan"]
+sources: ["https://github.com/JP-Makers/twincan/releases/download/v1.0.0/TwinCAN.tar.gz"]
+sha256sums: ["a31c61e733ae21eaa645de0e870c03d4fdb812c7e5a0a5666ef229ceba7fa8f4"]
+
+appimage_exec: "/usr/bin/TwinCAN"
+
+appimage_desktop: {
+    install -m644 "TwinCAN/TwinCAN.desktop"
+}
+
+appimage_icon: {
+    install -m644 "TwinCAN/TwinCAN.svg"
+}
 
 package: {
-    install -m755 "bl" to "/usr/bin/"
-    install -m644 "LICENSE" to "/usr/share/licenses/beauty-list/"
+    install -m755 "TwinCAN/TwinCAN" to "/usr/bin/"
+    install -m644 "TwinCAN/TwinCAN.desktop" to "/usr/share/applications/"
+    install -m644 "TwinCAN/TwinCAN.svg" to "/usr/share/icons/TwinCAN/"
+    install -m644 "TwinCAN/LICENSE" to "/usr/share/licenses/twincan/"
 }
