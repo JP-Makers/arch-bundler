@@ -6,9 +6,6 @@ use tokio::io::AsyncWriteExt;
 
 pub async fn fetch_source(source: &str) -> Result<String, Box<dyn std::error::Error>> {
     if source.starts_with("http://") || source.starts_with("https://") {
-        let client = Client::new();
-        let response = client.get(source).send().await?;
-
         // Try to get filename from URL
         let filename = source
             .split('/')
@@ -18,6 +15,15 @@ pub async fn fetch_source(source: &str) -> Result<String, Box<dyn std::error::Er
             .next()
             .unwrap_or("downloaded_file")
             .to_string();
+
+        // Skip download if file already exists (cache)
+        if Path::new(&filename).exists() {
+            println!("Using cached {}", filename);
+            return Ok(filename);
+        }
+
+        let client = Client::new();
+        let response = client.get(source).send().await?;
 
         let mut file = File::create(&filename).await?;
         let mut stream = response.bytes_stream();

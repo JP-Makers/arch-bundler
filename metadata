@@ -7,13 +7,13 @@ description: Twincan is a simple file manager for the terminal
 arch: ["x86_64"]
 url: https://github.com/JP-Makers/twincan
 license: MIT
-alpm_depends: ["bash"]
-deb_depends: ["bash"]
+alpm_depends: ["qt6-base"]
+deb_depends: ["qt6-base-dev"]
+rpm_depends: ["qt6-qtbase-gui"]
 provides: ["twincan"]
 conflicts: ["twincan"]
-alpm_build_env: ["check", "color"]
 sources: ["https://github.com/JP-Makers/twincan/releases/download/v1.0.0/TwinCAN.tar.gz"]
-md5sums: ["c22522c02789ec40bf993bf03012e29d", "6911f9e0ef2f3a17137696efedecec59", "ffe437529ca0f5e641ce6807883e0bb6"]
+sha256sums: ["a31c61e733ae21eaa645de0e870c03d4fdb812c7e5a0a5666ef229ceba7fa8f4"]
 
 appimage_exec: "/usr/bin/TwinCAN"
 

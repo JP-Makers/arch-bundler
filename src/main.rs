@@ -9,6 +9,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     alpm_build()?;
     appimage_build()?;
     deb_build()?;
-    //rpm_build()?;
+    rpm_build()?;
     Ok(())
 }

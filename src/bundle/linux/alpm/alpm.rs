@@ -42,7 +42,7 @@ pub fn alpm_build() -> Result<(), Box<dyn std::error::Error>> {
     // Cleanup
     //std::fs::remove_dir_all(&base_dir)?;
 
-    println!("✓ Package created successfully!");
-    println!("  Location: {}/output/", std::env::current_dir()?.display());
+    println!("Package created successfully!");
+    println!("Location: {}/output/", std::env::current_dir()?.display());
     Ok(())
 }

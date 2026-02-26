@@ -1,9 +1,11 @@
+use crate::bundle::linux::alpm::pkg_info::get_installed_size;
 use crate::chmod::chmod_package;
 use crate::metadata;
 use flate2::Compression;
 use flate2::write::GzEncoder;
+use md5::{Digest, Md5};
 use std::fs::{self, File};
-use std::io::{self, Write};
+use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use tar::Builder;
 
@@ -35,36 +37,58 @@ pub fn deb_build() -> Result<(), Box<dyn std::error::Error>> {
         "Version: {}-{}",
         metadata.version, metadata.release
     )?;
-    writeln!(control_file, "Section: utils")?;
-    writeln!(control_file, "Priority: optional")?;
     writeln!(control_file, "Architecture: {}", architecture)?;
-    if !metadata.deb_depends.is_empty() {
-        writeln!(control_file, "Depends: {}", metadata.deb_depends.join(", "))?;
-    }
     writeln!(
         control_file,
         "Maintainer: {} <{}>",
         metadata.maintainer, metadata.email
     )?;
-    writeln!(control_file, "Description: {}", metadata.description)?;
+    writeln!(
+        control_file,
+        "Installed-Size: {}",
+        get_installed_size(&base_dir)
+    )?;
+    if !metadata.deb_depends.is_empty() {
+        writeln!(control_file, "Depends: {}", metadata.deb_depends.join(", "))?;
+    }
+    if !metadata.conflicts.is_empty() {
+        writeln!(control_file, "Conflicts: {}", metadata.conflicts.join(", "))?;
+    }
+    if !metadata.provides.is_empty() {
+        writeln!(control_file, "Provides: {}", metadata.provides.join(", "))?;
+    }
+    writeln!(control_file, "Section: utils")?;
+    writeln!(control_file, "Priority: optional")?;
     writeln!(control_file, "Homepage: {}", metadata.url)?;
+    writeln!(control_file, "Description: {}", metadata.description)?;
+
+    // Create postrm script
+    let postrm_path = debian_dir.join("postrm");
+    let mut postrm_file = File::create(&postrm_path)?;
+    write!(
+        postrm_file,
+        "#!/bin/sh\nset -e\nif [ \"$1\" = \"remove\" ] || [ \"$1\" = \"purge\" ]; then\n    apt-get autoremove -y 2>/dev/null || true\nfi\n"
+    )?;
+    // Make postrm executable (chmod 755)
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&postrm_path, fs::Permissions::from_mode(0o755))?;
+    }
 
     // Create debian-binary
     let debian_binary_path = base_dir.join("debian-binary");
     let mut debian_binary = File::create(&debian_binary_path)?;
     write!(debian_binary, "2.0\n")?;
 
-    // Create data.tar.gz
-    let data_tar_gz_path = base_dir.join("data.tar.gz");
-    let data_tar_gz = File::create(&data_tar_gz_path)?;
-    let enc = GzEncoder::new(data_tar_gz, Compression::default());
-    let mut tar = Builder::new(enc);
+    // Collect data files and compute md5sums
+    let mut md5sums_entries: Vec<(String, String)> = Vec::new();
+    let mut data_files: Vec<(PathBuf, PathBuf)> = Vec::new(); // (abs_path, rel_path)
 
-    // Add all files from base_dir except DEBIAN, debian-binary, and the archives themselves
     for entry in walkdir::WalkDir::new(&base_dir) {
         let entry = entry?;
-        let path = entry.path();
-        let rel_path = path.strip_prefix(&base_dir)?;
+        let path = entry.path().to_path_buf();
+        let rel_path = path.strip_prefix(&base_dir)?.to_path_buf();
 
         if rel_path.starts_with("DEBIAN")
             || rel_path == Path::new("debian-binary")
@@ -76,21 +100,52 @@ pub fn deb_build() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         if path.is_file() {
-            tar.append_path_with_name(path, rel_path)?;
+            // Compute MD5
+            let mut file_data = Vec::new();
+            File::open(&path)?.read_to_end(&mut file_data)?;
+            let mut hasher = Md5::new();
+            hasher.update(&file_data);
+            let digest = hasher.finalize();
+            let rel_str = rel_path.to_string_lossy().into_owned();
+            md5sums_entries.push((format!("{:x}", digest), rel_str.clone()));
+            data_files.push((path, rel_path));
         } else if path.is_dir() {
-            tar.append_dir(rel_path, path)?;
+            data_files.push((path, rel_path));
+        }
+    }
+
+    // Create md5sums file in DEBIAN/
+    let md5sums_path = debian_dir.join("md5sums");
+    let mut md5sums_file = File::create(&md5sums_path)?;
+    for (hash, rel) in &md5sums_entries {
+        writeln!(md5sums_file, "{}  {}", hash, rel)?;
+    }
+
+    // Create data.tar.gz
+    let data_tar_gz_path = base_dir.join("data.tar.gz");
+    let data_tar_gz = File::create(&data_tar_gz_path)?;
+    let enc = GzEncoder::new(data_tar_gz, Compression::default());
+    let mut tar = Builder::new(enc);
+
+    for (abs_path, rel_path) in &data_files {
+        if abs_path.is_file() {
+            tar.append_path_with_name(abs_path, rel_path)?;
+        } else if abs_path.is_dir() {
+            tar.append_dir(rel_path, abs_path)?;
         }
     }
     tar.finish()?;
     let enc = tar.into_inner()?;
     enc.finish()?;
 
-    // Create control.tar.gz
+    // Create control.tar.gz (includes control, md5sums, postrm)
     let control_tar_gz_path = base_dir.join("control.tar.gz");
     let control_tar_gz = File::create(&control_tar_gz_path)?;
     let enc = GzEncoder::new(control_tar_gz, Compression::default());
     let mut tar = Builder::new(enc);
     tar.append_path_with_name(debian_dir.join("control"), "control")?;
+    tar.append_path_with_name(&md5sums_path, "md5sums")?;
+    tar.append_path_with_name(&postrm_path, "postrm")?;
     tar.finish()?;
     let enc = tar.into_inner()?;
     enc.finish()?;

@@ -1,5 +1,6 @@
+use sha2::{Digest, Sha256};
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Read};
 
 #[derive(Debug)]
 pub struct Metadata {
@@ -14,6 +15,7 @@ pub struct Metadata {
     pub license: String,
     pub alpm_depends: Vec<String>,
     pub deb_depends: Vec<String>,
+    pub rpm_depends: Vec<String>,
     pub provides: Vec<String>,
     pub conflicts: Vec<String>,
     pub sources: Vec<String>,
@@ -26,6 +28,7 @@ pub struct Metadata {
     pub package_instructions: Vec<String>,
     pub appimage_icon_instructions: Vec<String>,
     pub appimage_desktop_instructions: Vec<String>,
+    pub pkgbuild_sha256sum: String,
 }
 
 impl Default for Metadata {
@@ -42,6 +45,7 @@ impl Default for Metadata {
             license: String::new(),
             alpm_depends: Vec::new(),
             deb_depends: Vec::new(),
+            rpm_depends: Vec::new(),
             provides: Vec::new(),
             conflicts: Vec::new(),
             sources: Vec::new(),
@@ -60,15 +64,25 @@ impl Default for Metadata {
             package_instructions: Vec::new(),
             appimage_icon_instructions: Vec::new(),
             appimage_desktop_instructions: Vec::new(),
+            pkgbuild_sha256sum: String::new(),
         }
     }
 }
 
 pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::error::Error>> {
-    let metadata_file = File::open(metadata_path)?;
-    let reader = BufReader::new(metadata_file);
+    let mut metadata_file = File::open(metadata_path)?;
+
+    // Calculate SHA256 of the metadata file
+    let mut hasher = Sha256::new();
+    let mut buffer = Vec::new();
+    metadata_file.read_to_end(&mut buffer)?;
+    hasher.update(&buffer);
+    let pkgbuild_sha256sum = hex::encode(hasher.finalize());
+
+    let reader = BufReader::new(&buffer[..]);
 
     let mut metadata = Metadata::default();
+    metadata.pkgbuild_sha256sum = pkgbuild_sha256sum;
     let mut lines = reader.lines();
     while let Some(line) = lines.next() {
         let line = line?;
@@ -115,6 +129,7 @@ pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::er
                 "license" => metadata.license = value.to_string(),
                 "alpm_depends" => metadata.alpm_depends = parse_array(value),
                 "deb_depends" => metadata.deb_depends = parse_array(value),
+                "rpm_depends" => metadata.rpm_depends = parse_array(value),
                 "provides" => metadata.provides = parse_array(value),
                 "conflicts" => metadata.conflicts = parse_array(value),
                 "sources" => metadata.sources = parse_array(value),
@@ -166,7 +181,11 @@ pub fn extract_metadata(metadata_path: &str) -> Result<Metadata, Box<dyn std::er
     }
 
     if metadata.deb_depends.is_empty() {
-        return Err("Package depends not found".into());
+        return Err("Package depends (deb_depends) not found".into());
+    }
+
+    if metadata.rpm_depends.is_empty() {
+        return Err("Package depends (rpm_depends) not found".into());
     }
 
     if metadata.provides.is_empty() {
@@ -217,6 +236,7 @@ pub fn print_metadata(metadata_path: &str) -> Result<(), Box<dyn std::error::Err
     println!("License: {}", metadata.license);
     println!("ALPM Depends: {:?}", metadata.alpm_depends);
     println!("DEB Depends: {:?}", metadata.deb_depends);
+    println!("RPM Depends: {:?}", metadata.rpm_depends);
     println!("Provides: {:?}", metadata.provides);
     println!("Conflicts: {:?}", metadata.conflicts);
     println!("Sources: {:?}", metadata.sources);
